@@ -37,7 +37,7 @@ class App extends Component {
 
   calculateAverage(resources) {
     if (resources.length < 1) { return }
-    const calculation = resources.reduce((a,b) => parseInt(a) + parseInt(b), 0) / resources.length
+    const calculation = resources.reduce((a,b) => parseFloat(a) + parseFloat(b), 0) / resources.length
     return calculation.toFixed(2)
   }
 
@@ -54,10 +54,13 @@ class App extends Component {
     const subjectsWithNotes = this.state.subjects.filter(subject => {
       return this.state.notes[subject]
     })
-    const subjectsAverages = subjectsWithNotes.map(subject => {
-      return this.calculateAverage(this.state.notes[subject])
+
+    const values = subjectsWithNotes.map(subject => {
+      const notes = this.state.notes[subject]
+      return this.calculateAverage(notes)
     })
-    const arrAvg = this.calculateAverage(subjectsAverages)
+
+    const arrAvg = this.calculateAverage(values)
     return arrAvg
   }
 
