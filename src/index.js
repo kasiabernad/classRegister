@@ -10,7 +10,7 @@ class App extends Component {
     super(props)
     this.state = { subjects: [], selectedSubject: '', notes: {} }
 
-    this.handleAdd = this.handleAdd.bind(this);
+    this.handleSubjectAdd = this.handleSubjectAdd.bind(this);
     this.handleNoteAdd = this.handleNoteAdd.bind(this);
     this.setSelectedSubject = this.setSelectedSubject.bind(this);
     this.removeSubject = this.removeSubject.bind(this);
@@ -18,7 +18,7 @@ class App extends Component {
     this.calculateSubjectAverage = this.calculateSubjectAverage.bind(this);
   }
 
-  handleAdd(newSubject) {
+  handleSubjectAdd(newSubject) {
     this.setState({ subjects: [...this.state.subjects, newSubject] });
   }
 
@@ -35,23 +35,29 @@ class App extends Component {
     this.setState({selectedSubject: subject })
   }
 
+  calculateAverage(resources) {
+    if (resources.length < 1) { return }
+    const calculation = resources.reduce((a,b) => parseInt(a) + parseInt(b), 0) / resources.length
+    return calculation.toFixed(2)
+  }
+
   calculateSubjectAverage(subject) {
     if (!this.state.notes[subject] || this.state.notes[subject].length === 0) {
       return
     }
     const notes = this.state.notes[subject]
-    const arrAvg = notes.reduce((a,b) => parseInt(a) + parseInt(b), 0) / notes.length
+    const arrAvg = this.calculateAverage(notes)
     return arrAvg
   }
 
   calculateGeneralAverage() {
-    const keys = Object.keys(this.state.notes)
-    const values = [].concat( ...Object.values(this.state.notes))
-
-    if (values.length === 0) {
-      return
-    }
-    const arrAvg = values.reduce((a,b) => parseInt(a) + parseInt(b), 0) / values.length
+    const subjectsWithNotes = this.state.subjects.filter(subject => {
+      return this.state.notes[subject]
+    })
+    const subjectsAverages = subjectsWithNotes.map(subject => {
+      return this.calculateAverage(this.state.notes[subject])
+    })
+    const arrAvg = this.calculateAverage(subjectsAverages)
     return arrAvg
   }
 
@@ -116,7 +122,7 @@ class App extends Component {
               average={this.calculateSubjectAverage}
               selected={this.state.selectedSubject}
               />
-            <SubjectsNew onSubjectCreated={this.handleAdd}/>
+            <SubjectsNew onSubjectCreated={this.handleSubjectAdd}/>
           </div>
           <div className="col-md-6 mb-4">
             {this.renderNotes()}
